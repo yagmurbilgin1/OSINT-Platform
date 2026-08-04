@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>OSINT Sonuçları</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🛡️ OSINT Sonuçları</h1>
+
+{% for item in results %}
+
+<div class="card">
+
+<h2>{{ item.title }}</h2>
+
+<p>{{ item.description }}</p>
+
+<p>📌 <strong>Kaynak:</strong> {{ item.source }}</p>
+
+<p>⚠️ <strong>Risk:</strong> {{ item.severity }}</p>
+
+</div>
+
+{% endfor %}
+
+<br>
+
+<a href="/">← Yeni Arama</a>
+
+</div>
+
+</body>
+
+</html>
