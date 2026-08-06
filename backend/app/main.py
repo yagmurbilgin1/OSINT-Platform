@@ -25,11 +25,12 @@ def home():
 def search():
 
     keyword = request.form["keyword"]
+    severity = request.form["severity"]
 
     # Arama kelimesini veritabanına kaydet
     save_search(keyword)
 
-    results = search_security(keyword)
+    results = search_security(keyword, severity)
 
     return render_template(
         "results.html",

@@ -22,7 +22,16 @@
             name="keyword"
             placeholder="Örneğin: Windows, Cisco, Fortinet"
             required>
-    
+          
+        <select name="severity">
+
+                <option value="ALL">Tüm Riskler</option>
+                <option value="CRITICAL">Critical</option>
+                <option value="HIGH">High</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="LOW">Low</option>
+        
+            </select>
         <button type="submit">
             Güvenlik Duyarısı Ara
         </button>
