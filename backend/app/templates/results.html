@@ -2,44 +2,83 @@
 <html lang="tr">
 
 <head>
+    <meta charset="UTF-8">
+    <title>OSINT Sonuçları</title>
 
-<meta charset="UTF-8">
-
-<title>OSINT Sonuçları</title>
-
-<link rel="stylesheet"
-href="{{ url_for('static', filename='css/style.css') }}">
-
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
 
 <div class="container">
 
-<h1>🛡️ OSINT Sonuçları</h1>
+    <h1>🛡️ OSINT Sonuçları</h1>
 
-{% for item in results %}
+    {% for item in results %}
 
-<div class="card">
+    <div class="card">
 
-<h2>{{ item.title }}</h2>
+        <h2>{{ item.title }}</h2>
 
-<p>{{ item.description }}</p>
+        <p>{{ item.description }}</p>
 
-<p>📌 <strong>Kaynak:</strong> {{ item.source }}</p>
+        <p>📌 <strong>Kaynak:</strong> {{ item.source }}</p>
 
-<p>⚠️ <strong>Risk:</strong> {{ item.severity }}</p>
+        <p>
+            ⚠️ <strong>Risk:</strong>
 
-</div>
+            {% if item.severity == "CRITICAL" %}
+                <span class="critical">{{ item.severity }}</span>
 
-{% endfor %}
+            {% elif item.severity == "HIGH" %}
+                <span class="high">{{ item.severity }}</span>
 
-<br>
+            {% elif item.severity == "MEDIUM" %}
+                <span class="medium">{{ item.severity }}</span>
+
+            {% elif item.severity == "LOW" %}
+                <span class="low">{{ item.severity }}</span>
+
+            {% else %}
+                <span>{{ item.severity }}</span>
+
+            {% endif %}
+        </p>
+
+        <p>📊 <strong>CVSS Skoru:</strong> {{ item.score }}</p>
+        
+        <p>📅 <strong>Yayın Tarihi:</strong> {{ item.published }}</p>
+
+        <p>🔄 <strong>Son Güncelleme:</strong> {{ item.modified }}</p>
+        
+        <br>
+
+        <a class="detail-button"
+           href="https://nvd.nist.gov/vuln/detail/{{ item.title }}"
+           target="_blank">
+            🔗 Detayları Gör
+        </a>
+
+    </div>
+
+    {% endfor %}
+
+    <br>
+
+    <a href="/">← Yeni Arama</a>
+
+    <br>
 
 <a href="/">← Yeni Arama</a>
+
+&nbsp;&nbsp;&nbsp;
+
+<a class="history-button" href="/history">
+    🕘 Arama Geçmişi
+</a>
 
 </div>
 
 </body>
-
 </html>

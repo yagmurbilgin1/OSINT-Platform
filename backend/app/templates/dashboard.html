@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>📊 Dashboard</h1>
+
+    <div class="card">
+        <h2>📈 Toplam Arama</h2>
+        <p>{{ total }}</p>
+    </div>
+
+    <div class="card">
+        <h2>🏆 En Çok Aranan Kelime</h2>
+        <p>{{ top }}</p>
+    </div>
+
+    <div class="card">
+        <h2>🕒 Son Aranan Kelime</h2>
+        <p>{{ last }}</p>
+    </div>
+
+    <div class="card">
+        <h2>📅 Bugünkü Arama Sayısı</h2>
+        <p>{{ today }}</p>
+    </div>
+
+    <br>
+
+    <a class="history-button" href="/">
+        ← Ana Sayfa
+    </a>
+
+</div>
+
+</body>
+</html>
