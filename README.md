@@ -1,276 +1,120 @@
 # 🛡️ OSINT Platform
 
-Güvenlik duyurularını ve CVE bilgilerini internet üzerindeki açık kaynaklardan
-toplayarak kullanıcıya sunan Python tabanlı bir OSINT uygulamasıdır.
+OSINT Platform, herkese açık siber güvenlik verilerini ve CVE (Common Vulnerabilities and Exposures) kayıtlarını toplayarak kullanıcıya sunan Python tabanlı bir web uygulamasıdır.
+
+Uygulama, kullanıcı tarafından girilen anahtar kelimelere göre NVD (National Vulnerability Database) üzerinde güvenlik açığı araması gerçekleştirir. Elde edilen CVE kayıtları açıklama, severity seviyesi, CVSS skoru, yayınlanma tarihi ve son güncelleme tarihi gibi bilgilerle birlikte kullanıcıya sunulur.
+
+---
 
 ## 📌 Proje Hakkında
 
-Bu projenin amacı, güvenlik açıkları hakkında herkese açık kaynaklardan
-bilgi toplayarak kullanıcıların bu bilgilere daha kolay ulaşmasını sağlamaktır.
+Bu projenin amacı, güvenlik açıkları hakkında herkese açık kaynaklarda bulunan bilgilerin daha kolay aranabilmesini ve incelenebilmesini sağlamaktır.
 
-Uygulamada kullanıcı bir anahtar kelime girerek güvenlik açığı araması
-yapabilir. Sistem NVD (National Vulnerability Database) üzerinden ilgili
-CVE kayıtlarını getirir ve sonuçları kullanıcıya sunar.
+Kullanıcı uygulamanın ana sayfasından bir anahtar kelime girerek güvenlik açığı araması yapabilir. Ayrıca sonuçları severity seviyesine göre filtreleyebilir.
 
-## 🎯 Temel Özellikler
+Sistem, NVD'nin herkese açık CVE API servisini kullanarak ilgili güvenlik açığı kayıtlarını getirir.
 
-- 🔎 Anahtar kelime ile güvenlik açığı arama
+Arama işlemleri aynı zamanda SQLite veritabanında saklanarak kullanıcının daha sonra arama geçmişini görüntüleyebilmesine olanak sağlar.
+
+---
+
+## 🎯 Projenin Amacı
+
+Projenin temel amaçları:
+
+- Açık kaynaklardan siber güvenlik verilerine erişmek
+- CVE kayıtlarının aranmasını kolaylaştırmak
+- Güvenlik açıklarını severity seviyelerine göre filtrelemek
+- CVSS skorlarını kullanıcıya göstermek
+- Arama geçmişini veritabanında saklamak
+- Arama geçmişini istatistiksel olarak görüntülemek
+- Verileri CSV ve PDF formatlarında dışa aktarabilmek
+- Kullanıcıların güvenlik açıkları hakkında hızlı bilgi edinebilmesini sağlamak
+
+---
+
+## 🔎 Temel Özellikler
+
+Uygulamanın mevcut sürümünde aşağıdaki özellikler bulunmaktadır:
+
+- 🔎 Anahtar kelime ile CVE arama
 - ⚠️ Severity seviyesine göre filtreleme
 - 📊 CVSS skoru gösterme
+- 📝 CVE açıklaması gösterme
 - 📅 Yayınlanma tarihi gösterme
 - 🔄 Son güncelleme tarihini gösterme
-- 🔗 CVE kaydına ait NVD bağlantısı
+- 🔗 NVD üzerindeki orijinal CVE kaydına bağlantı
 - 🗄️ SQLite veritabanı kullanımı
 - 🕘 Arama geçmişinin tutulması
 - 📊 Dashboard
-- 📥 Arama geçmişini CSV olarak indirme
-- 📄 Arama geçmişini PDF olarak indirme
+- 📥 Arama geçmişini CSV olarak dışa aktarma
+- 📄 Arama geçmişini PDF olarak dışa aktarma
+
+---
 
 ## 🛠️ Kullanılan Teknolojiler
 
+### Backend
+
 - Python
 - Flask
-- SQLite
+- Requests
+
+### Frontend
+
 - HTML
 - CSS
 - Jinja2
-- Requests
+
+### Database
+
+- SQLite
+
+### PDF
+
 - ReportLab
+
+### Veri Kaynağı
+
 - NVD CVE API
 
+### Geliştirme Araçları
+
+- Visual Studio Code
+- Git
+- GitHub
+- Python Virtual Environment (venv)
+
+---
+
 ## 🏗️ Proje Yapısı
+
+Projenin mevcut klasör yapısı aşağıdaki gibidir:
 
 ```text
 OSINT-Platform/
 │
 ├── backend/
-│   ├── app/
-│   │   ├── main.py
-│   │   ├── crawler.py
-│   │   ├── database.py
-│   │   ├── osint.db
-│   │   │
-│   │   ├── templates/
-│   │   │   ├── index.html
-│   │   │   ├── results.html
-│   │   │   ├── history.html
-│   │   │   └── dashboard.html
-│   │   │
-│   │   └── static/
-│   │       └── css/
-│   │           └── style.css
-│   │
-│   └── venv/
+│   └── app/
+│       ├── main.py
+│       ├── crawler.py
+│       ├── database.py
+│       ├── osint.db
+│       │
+│       ├── templates/
+│       │   ├── index.html
+│       │   ├── results.html
+│       │   ├── history.html
+│       │   └── dashboard.html
+│       │
+│       └── static/
+│           └── css/
+│               └── style.css
 │
 ├── data/
 ├── docs/
 ├── frontend/
 ├── logs/
+├── venv/
+├── requirements.txt
 └── README.md
-```
-
-## 🔎 Veri Kaynağı
-
-Uygulamanın güvenlik açığı verilerini almak için NVD'nin CVE API servisi
-kullanılmaktadır.
-
-NVD üzerinden alınan bilgiler arasında:
-
-- CVE ID
-- Açıklama
-- Severity
-- CVSS skoru
-- Yayın tarihi
-- Son güncelleme tarihi
-
-bulunmaktadır.
-
-## ⚙️ Çalışma Mantığı
-
-Sistem temel olarak aşağıdaki şekilde çalışmaktadır:
-
-```text
-Kullanıcı
-   │
-   ▼
-Ana Sayfa
-   │
-   ▼
-Anahtar Kelime + Severity
-   │
-   ▼
-Crawler
-   │
-   ▼
-NVD CVE API
-   │
-   ▼
-CVE Sonuçları
-   │
-   ├── CVE ID
-   ├── Açıklama
-   ├── Severity
-   ├── CVSS
-   ├── Yayın Tarihi
-   └── Güncelleme Tarihi
-   │
-   ▼
-Kullanıcıya Gösterim
-```
-
-Aynı zamanda yapılan aramalar SQLite veritabanında tutulmaktadır.
-
-## 🗄️ Veritabanı
-
-Projede arama geçmişinin tutulması için SQLite kullanılmaktadır.
-
-Arama kayıtlarında temel olarak:
-
-- Aranan kelime
-- Arama tarihi
-
-bilgileri tutulmaktadır.
-
-Bu bilgiler;
-
-- Arama Geçmişi
-- Dashboard
-- CSV çıktısı
-- PDF çıktısı
-
-özelliklerinde kullanılmaktadır.
-
-## 📊 Dashboard
-
-Dashboard bölümünde arama geçmişinden elde edilen istatistikler
-gösterilmektedir.
-
-Dashboard üzerinde:
-
-- Toplam arama sayısı
-- En çok aranan kelime
-- Son aranan kelime
-- Bugünkü arama sayısı
-
-bilgileri görüntülenmektedir.
-
-## 📥 CSV Dışa Aktarma
-
-Arama geçmişi CSV formatında dışa aktarılabilmektedir.
-
-CSV dosyasında arama kelimesi ve arama tarihi bilgileri bulunmaktadır.
-
-## 📄 PDF Dışa Aktarma
-
-Arama geçmişi PDF formatında da dışa aktarılabilmektedir.
-
-PDF içerisinde arama kelimeleri ve arama tarihleri listelenmektedir.
-
-## 🚀 Kurulum
-
-Projeyi çalıştırmak için Python'un bilgisayarda kurulu olması gerekir.
-
-### 1. Projeyi klonlama
-
-```bash
-git clone https://github.com/yagmurbilgin1/OSINT-Platform.git
-```
-
-### 2. Proje klasörüne girme
-
-```bash
-cd OSINT-Platform
-```
-
-### 3. Backend klasörüne girme
-
-```bash
-cd backend
-```
-
-### 4. Virtual environment oluşturma
-
-```bash
-python -m venv venv
-```
-
-### 5. Virtual environment'ı aktifleştirme
-
-Windows PowerShell:
-
-```powershell
-.\venv\Scripts\activate
-```
-
-### 6. Gerekli paketleri yükleme
-
-```bash
-pip install -r requirements.txt
-```
-
-## ▶️ Uygulamayı Çalıştırma
-
-Backend içerisindeki `app` klasörüne girilir:
-
-```bash
-cd app
-```
-
-Daha sonra:
-
-```bash
-python main.py
-```
-
-komutu çalıştırılır.
-
-Flask uygulaması çalıştıktan sonra tarayıcıdan:
-
-```text
-http://127.0.0.1:5000
-```
-
-adresine gidilebilir.
-
-## 🖥️ Kullanım
-
-1. Ana sayfayı açın.
-2. Arama kutusuna bir anahtar kelime girin.
-3. İstenilen severity seviyesini seçin.
-4. Arama işlemini başlatın.
-5. Sistem NVD üzerinden ilgili CVE kayıtlarını getirir.
-6. Sonuçlarda CVE bilgileri görüntülenir.
-7. Arama geçmişi bölümünden geçmiş aramalar incelenebilir.
-8. Geçmiş kayıtları CSV veya PDF olarak dışa aktarılabilir.
-9. Dashboard üzerinden arama istatistikleri görüntülenebilir.
-
-## ⚠️ Mevcut Sınırlılıklar
-
-Mevcut sürüm, temel OSINT güvenlik duyurusu toplama ve görüntüleme
-işlevlerine odaklanmaktadır.
-
-Mevcut sürümde veri toplama temel olarak NVD kaynağı üzerinden
-gerçekleştirilmektedir.
-
-Çoklu kaynak desteği, gelişmiş background job sistemi, kapsamlı API
-mimarisi, Docker altyapısı ve otomatik test kapsamı sonraki geliştirme
-aşamalarında ele alınabilecek özelliklerdir.
-
-## 🔮 Gelecekteki Geliştirmeler
-
-- FastAPI tabanlı REST API
-- Birden fazla güvenilir güvenlik kaynağının eklenmesi
-- Background crawl işlemleri
-- Crawl ilerleme durumunun gösterilmesi
-- Kaynak yönetimi
-- Gelişmiş log sistemi
-- Otomatik testlerin genişletilmesi
-- Docker ve Docker Compose desteği
-- Gelişmiş güvenlik kontrolleri
-- Daha gelişmiş dashboard ve grafikler
-
-## 👩‍💻 Proje
-
-**OSINT Platform**
-
-Python ve Flask kullanılarak geliştirilmiştir.
