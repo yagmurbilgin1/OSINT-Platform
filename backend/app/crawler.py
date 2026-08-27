@@ -4,17 +4,12 @@ import requests
 def search_security(keyword, severity):
 
     url = (
-        "https://services.nvd.nist.gov/rest/json/cves/2.0"
+        f"https://services.nvd.nist.gov/rest/json/cves/2.0"
         f"?keywordSearch={keyword}&resultsPerPage=5"
     )
 
-    try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-
-    except requests.RequestException:
-        return []
+    response = requests.get(url)
+    data = response.json()
 
     results = []
 
@@ -40,27 +35,54 @@ def search_security(keyword, severity):
 
                 metrics = cve["metrics"]
 
-                if "cvssMetricV31" in metrics:
-                    metric = metrics["cvssMetricV31"][0]
-                    severity_level = metric["cvssData"]["baseSeverity"]
-                    score = metric["cvssData"]["baseScore"]
-
-                elif "cvssMetricV30" in metrics:
-                    metric = metrics["cvssMetricV30"][0]
-                    severity_level = metric["cvssData"]["baseSeverity"]
-                    score = metric["cvssData"]["baseScore"]
-
-                elif "cvssMetricV2" in metrics:
-                    metric = metrics["cvssMetricV2"][0]
+                if "cvssMetricV40" in metrics:
+                    metric = metrics["cvssMetricV40"][0]
                     severity_level = metric["cvssData"].get(
                         "baseSeverity",
                         "Unknown"
                     )
-                    score = metric["cvssData"]["baseScore"]
+                    score = metric["cvssData"].get(
+                        "baseScore",
+                        "N/A"
+                    )
+
+                elif "cvssMetricV31" in metrics:
+                    metric = metrics["cvssMetricV31"][0]
+                    severity_level = metric["cvssData"].get(
+                        "baseSeverity",
+                        "Unknown"
+                    )
+                    score = metric["cvssData"].get(
+                        "baseScore",
+                        "N/A"
+                    )
+
+                elif "cvssMetricV30" in metrics:
+                    metric = metrics["cvssMetricV30"][0]
+                    severity_level = metric["cvssData"].get(
+                        "baseSeverity",
+                        "Unknown"
+                    )
+                    score = metric["cvssData"].get(
+                        "baseScore",
+                        "N/A"
+                    )
+
+                elif "cvssMetricV2" in metrics:
+                    metric = metrics["cvssMetricV2"][0]
+                    severity_level = metric.get(
+                        "baseSeverity",
+                        "Unknown"
+                    )
+                    score = metric["cvssData"].get(
+                        "baseScore",
+                        "N/A"
+                    )
 
             # Severity filtresi
-            if severity != "ALL" and severity != severity_level:
-                continue
+            if severity.upper() != "ALL":
+                if severity_level.upper() != severity.upper():
+                    continue
 
             # Sonucu listeye ekle
             results.append({
