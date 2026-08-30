@@ -3,45 +3,252 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>OSINT Platform - Dashboard</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 
 <body>
 
 <div class="container">
 
-    <h1>📊 Dashboard</h1>
+    <h1>📊 OSINT Dashboard</h1>
+
+    <p>Açık kaynak güvenlik duyurularının genel durumu</p>
+
+
+    <!-- ========================================= -->
+    <!-- GÜVENLİK DUYURULARI -->
+    <!-- ========================================= -->
 
     <div class="card">
-        <h2>📈 Toplam Arama</h2>
-        <p>{{ total }}</p>
+
+        <h2>🛡️ Toplam Güvenlik Duyurusu</h2>
+
+        <p id="total-advisories">Yükleniyor...</p>
+
     </div>
 
-    <div class="card">
-        <h2>🏆 En Çok Aranan Kelime</h2>
-        <p>{{ top }}</p>
-    </div>
+
+    <!-- ========================================= -->
+    <!-- TOPLAM KAYNAK -->
+    <!-- ========================================= -->
 
     <div class="card">
-        <h2>🕒 Son Aranan Kelime</h2>
-        <p>{{ last }}</p>
+
+        <h2>🌐 Toplam Kaynak</h2>
+
+        <p id="total-sources">Yükleniyor...</p>
+
     </div>
 
+
+    <!-- ========================================= -->
+    <!-- AKTİF KAYNAK -->
+    <!-- ========================================= -->
+
     <div class="card">
-        <h2>📅 Bugünkü Arama Sayısı</h2>
-        <p>{{ today }}</p>
+
+        <h2>🟢 Aktif Kaynak</h2>
+
+        <p id="active-sources">Yükleniyor...</p>
+
     </div>
+
+
+    <!-- ========================================= -->
+    <!-- CRAWL -->
+    <!-- ========================================= -->
+
+    <div class="card">
+
+        <h2>🔄 Toplam Crawl</h2>
+
+        <p id="total-crawls">Yükleniyor...</p>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- TAMAMLANAN CRAWL -->
+    <!-- ========================================= -->
+
+    <div class="card">
+
+        <h2>✅ Tamamlanan Crawl</h2>
+
+        <p id="completed-crawls">Yükleniyor...</p>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- RİSK DAĞILIMI -->
+    <!-- ========================================= -->
+
+    <div class="card">
+
+        <h2>⚠️ Risk Dağılımı</h2>
+
+        <p>🟢 LOW: <span id="low">0</span></p>
+
+        <p>🟡 MEDIUM: <span id="medium">0</span></p>
+
+        <p>🟠 HIGH: <span id="high">0</span></p>
+
+        <p>🔴 CRITICAL: <span id="critical">0</span></p>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- ARAMA İSTATİSTİKLERİ -->
+    <!-- ========================================= -->
+
+    <div class="card">
+
+        <h2>🔎 Arama İstatistikleri</h2>
+
+        <p>
+            🔍 Toplam Arama:
+            <span id="total-searches">Yükleniyor...</span>
+        </p>
+
+        <p>
+            🏆 En Çok Aranan:
+            <span id="most-searched">Yükleniyor...</span>
+        </p>
+
+        <p>
+            🕒 Son Aranan:
+            <span id="last-search">Yükleniyor...</span>
+        </p>
+
+        <p>
+            📅 Bugünkü Arama:
+            <span id="today-searches">Yükleniyor...</span>
+        </p>
+
+    </div>
+
 
     <br>
 
+
+    <!-- ========================================= -->
+    <!-- BUTONLAR -->
+    <!-- ========================================= -->
+
     <a class="history-button" href="/">
-        ← Ana Sayfa
+        🔎 Yeni Arama
     </a>
+
+    &nbsp;
+
+    <a class="history-button" href="/history">
+        🕒 Arama Geçmişi
+    </a>
+
 
 </div>
 
+
+<!-- ========================================= -->
+<!-- API BAĞLANTISI -->
+<!-- ========================================= -->
+
+<script>
+
+async function loadDashboard() {
+
+    try {
+
+        const response = await fetch("/api/dashboard");
+
+        if (!response.ok) {
+
+            throw new Error("API bağlantısı başarısız");
+
+        }
+
+        const data = await response.json();
+
+
+        // -----------------------------------------
+        // GENEL İSTATİSTİKLER
+        // -----------------------------------------
+
+        document.getElementById("total-advisories").textContent =
+            data.total_advisories;
+
+        document.getElementById("total-sources").textContent =
+            data.total_sources;
+
+        document.getElementById("active-sources").textContent =
+            data.active_sources;
+
+        document.getElementById("total-crawls").textContent =
+            data.total_crawls;
+
+        document.getElementById("completed-crawls").textContent =
+            data.completed_crawls;
+
+
+        // -----------------------------------------
+        // RİSK DAĞILIMI
+        // -----------------------------------------
+
+        document.getElementById("low").textContent =
+            data.severity.LOW;
+
+        document.getElementById("medium").textContent =
+            data.severity.MEDIUM;
+
+        document.getElementById("high").textContent =
+            data.severity.HIGH;
+
+        document.getElementById("critical").textContent =
+            data.severity.CRITICAL;
+
+
+        // -----------------------------------------
+        // ARAMA İSTATİSTİKLERİ
+        // -----------------------------------------
+
+        document.getElementById("total-searches").textContent =
+            data.total_searches;
+
+        document.getElementById("most-searched").textContent =
+            data.most_searched;
+
+        document.getElementById("last-search").textContent =
+            data.last_search;
+
+        document.getElementById("today-searches").textContent =
+            data.today_searches;
+
+
+    } catch (error) {
+
+        console.error(
+            "Dashboard verileri alınamadı:",
+            error
+        );
+
+    }
+
+}
+
+
+// Sayfa açıldığında API'den verileri çek
+loadDashboard();
+
+</script>
+
+
 </body>
+
 </html>

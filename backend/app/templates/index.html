@@ -6,50 +6,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>OSINT Platform</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 
 <body>
 
-    <h1>🛡️ OSINT Security Platform</h1>
+    <div class="container">
 
-    <p>Açık Kaynak Güvenlik Duyarı Takip Sistemi</p>
+        <h1>🛡️ OSINT Security Platform</h1>
 
-    <form action="/search" method="POST">
+        <p>Açık Kaynak Güvenlik Duyarı Takip Sistemi</p>
 
-        <input
-            type="text"
-            name="keyword"
-            placeholder="Örneğin: Windows, Cisco, Fortinet"
-            required>
-          
-        <select name="severity">
+        <form action="/search" method="POST">
+
+            <input
+                type="text"
+                name="keyword"
+                placeholder="Örneğin: Windows, Cisco, Fortinet"
+                required>
+
+            <select name="severity">
 
                 <option value="ALL">Tüm Riskler</option>
                 <option value="CRITICAL">Critical</option>
                 <option value="HIGH">High</option>
                 <option value="MEDIUM">Medium</option>
                 <option value="LOW">Low</option>
-        
+
             </select>
-        <button type="submit">
-            Güvenlik Duyarısı Ara
-        </button>
-    
-    </form>
+
+            <select name="source">
+
+                <option value="NVD">NVD</option>
+                <option value="CISA">CISA KEV</option>
+
+            </select>
+
+            <button type="submit">
+                Güvenlik Duyarısı Ara
+            </button>
+
+        </form>
+
+        <br>
+
+        <a class="history-button" href="/history">
+            🕘 Arama Geçmişi
+        </a>
+
+        <br><br>
+
+        <a class="history-button" href="/dashboard">
+            📊 Dashboard
+        </a>
+
+    </div>
 
 </body>
 
 </html>
-
-<br>
-
-<a class="history-button" href="/history">
-    🕘 Arama Geçmişi
-</a>
-
-<br><br>
-
-<a class="history-button" href="/dashboard">
-    📊 Dashboard
-</a>

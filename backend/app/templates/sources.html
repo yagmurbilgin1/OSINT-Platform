@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>OSINT Platform - Kaynaklar</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🌐 OSINT Kaynakları</h1>
+
+    <p>
+        Platformda kullanılan açık kaynak güvenlik kaynakları
+    </p>
+
+
+    <!-- =====================================================
+         YENİ KAYNAK EKLE
+         ===================================================== -->
+
+    <div class="card">
+
+        <h2>➕ Yeni Kaynak Ekle</h2>
+
+        <form id="add-source-form">
+
+            <p>
+                <strong>Kaynak Adı</strong>
+            </p>
+
+            <input
+                type="text"
+                id="source-name"
+                placeholder="Örn: NVD"
+                required
+                style="
+                    width: 100%;
+                    padding: 12px;
+                    margin-bottom: 15px;
+                    box-sizing: border-box;
+                "
+            >
+
+
+            <p>
+                <strong>Kaynak URL</strong>
+            </p>
+
+            <input
+                type="url"
+                id="source-url"
+                placeholder="https://example.com"
+                required
+                style="
+                    width: 100%;
+                    padding: 12px;
+                    margin-bottom: 15px;
+                    box-sizing: border-box;
+                "
+            >
+
+
+            <p>
+                <strong>Durum</strong>
+            </p>
+
+            <select
+                id="source-enabled"
+                style="
+                    width: 100%;
+                    padding: 12px;
+                    margin-bottom: 15px;
+                    box-sizing: border-box;
+                "
+            >
+
+                <option value="true">
+                    🟢 Aktif
+                </option>
+
+                <option value="false">
+                    🔴 Pasif
+                </option>
+
+            </select>
+
+
+            <button
+                type="submit"
+                class="history-button"
+            >
+                ➕ Kaynak Ekle
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <br>
+
+
+    <!-- =====================================================
+         KAYNAKLAR
+         ===================================================== -->
+
+    <div id="sources-container">
+
+        <p>Kaynaklar yükleniyor...</p>
+
+    </div>
+
+
+    <br>
+
+
+    <!-- =====================================================
+         NAVIGATION
+         ===================================================== -->
+
+    <a
+        class="history-button"
+        href="/dashboard"
+    >
+        📊 Dashboard
+    </a>
+
+    &nbsp;
+
+    <a
+        class="history-button"
+        href="/"
+    >
+        🔎 Ana Sayfa
+    </a>
+
+</div>
+
+
+<script>
+
+/* ==========================================================
+   KAYNAKLARI GETİR
+   ========================================================== */
+
+async function loadSources() {
+
+    try {
+
+        const response =
+            await fetch("/api/sources");
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Kaynaklar alınamadı"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const container =
+            document.getElementById(
+                "sources-container"
+            );
+
+
+        container.innerHTML = "";
+
+
+        if (
+            !data.sources ||
+            data.sources.length === 0
+        ) {
+
+            container.innerHTML = `
+                <div class="card">
+                    <h2>📭 Kaynak bulunamadı</h2>
+                    <p>
+                        Henüz kayıtlı bir kaynak yok.
+                    </p>
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        data.sources.forEach(
+            source => {
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.className =
+                    "card";
+
+
+                const status =
+                    source.enabled
+                        ? "🟢 Aktif"
+                        : "🔴 Pasif";
+
+
+                const approved =
+                    source.approved
+                        ? "✅ Onaylı"
+                        : "⏳ Onay bekliyor";
+
+
+                card.innerHTML = `
+
+                    <h2>
+                        ${escapeHtml(source.name)}
+                    </h2>
+
+                    <p>
+                        <strong>Tür:</strong>
+                        ${escapeHtml(source.source_type || "web")}
+                    </p>
+
+                    <p>
+                        <strong>Durum:</strong>
+                        ${status}
+                    </p>
+
+                    <p>
+                        <strong>Onay:</strong>
+                        ${approved}
+                    </p>
+
+                    <p>
+                        <strong>URL:</strong>
+
+                        <a
+                            href="${escapeAttribute(source.base_url)}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            ${escapeHtml(source.base_url)}
+                        </a>
+
+                    </p>
+
+
+                    <div
+                        style="
+                            margin-top: 20px;
+                            display: flex;
+                            gap: 10px;
+                            flex-wrap: wrap;
+                        "
+                    >
+
+                        <button
+                            class="history-button"
+                            onclick="toggleSource(
+                                ${source.id},
+                                ${source.enabled}
+                            )"
+                        >
+                            ${
+                                source.enabled
+                                    ? "🔴 Pasif Yap"
+                                    : "🟢 Aktif Yap"
+                            }
+                        </button>
+
+
+                        <button
+                            class="history-button"
+                            onclick="editSource(
+                                ${source.id},
+                                '${escapeJs(source.name)}',
+                                '${escapeJs(source.base_url)}',
+                                ${source.enabled}
+                            )"
+                        >
+                            ✏️ Düzenle
+                        </button>
+
+                    </div>
+
+                `;
+
+
+                container.appendChild(card);
+
+            }
+        );
+
+
+    } catch (error) {
+
+        document.getElementById(
+            "sources-container"
+        ).innerHTML = `
+
+            <div class="card">
+
+                <h2>❌ Hata</h2>
+
+                <p>
+                    Kaynaklar yüklenirken hata oluştu.
+                </p>
+
+                <p>
+                    ${escapeHtml(error.message)}
+                </p>
+
+            </div>
+
+        `;
+
+
+        console.error(error);
+
+    }
+
+}
+
+
+/* ==========================================================
+   AKTİF / PASİF DEĞİŞTİR
+   ========================================================== */
+
+async function toggleSource(
+    sourceId,
+    currentStatus
+) {
+
+    const newStatus =
+        !currentStatus;
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/sources/${sourceId}/status`,
+                {
+                    method: "PATCH",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        enabled: newStatus
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail ||
+                "Kaynak durumu değiştirilemedi"
+            );
+
+        }
+
+
+        alert(
+            newStatus
+                ? "🟢 Kaynak aktif edildi."
+                : "🔴 Kaynak pasif edildi."
+        );
+
+
+        await loadSources();
+
+
+    } catch (error) {
+
+        alert(
+            "❌ Hata: " +
+            error.message
+        );
+
+        console.error(error);
+
+    }
+
+}
+
+
+/* ==========================================================
+   KAYNAK DÜZENLE
+   ========================================================== */
+
+async function editSource(
+    sourceId,
+    currentName,
+    currentUrl,
+    currentEnabled
+) {
+
+    const newName =
+        prompt(
+            "Kaynak adını gir:",
+            currentName
+        );
+
+
+    if (newName === null) {
+
+        return;
+
+    }
+
+
+    const newUrl =
+        prompt(
+            "Kaynak URL'sini gir:",
+            currentUrl
+        );
+
+
+    if (newUrl === null) {
+
+        return;
+
+    }
+
+
+    const cleanName =
+        newName.trim();
+
+
+    const cleanUrl =
+        newUrl.trim();
+
+
+    if (!cleanName) {
+
+        alert(
+            "❌ Kaynak adı boş olamaz."
+        );
+
+        return;
+
+    }
+
+
+    if (!cleanUrl) {
+
+        alert(
+            "❌ Kaynak URL'si boş olamaz."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `/api/sources/${sourceId}`,
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        name: cleanName,
+
+                        base_url: cleanUrl,
+
+                        enabled:
+                            currentEnabled,
+
+                        request_delay_seconds: 2
+
+                    })
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail ||
+                "Kaynak güncellenemedi"
+            );
+
+        }
+
+
+        alert(
+            "✅ Kaynak başarıyla güncellendi."
+        );
+
+
+        await loadSources();
+
+
+    } catch (error) {
+
+        alert(
+            "❌ Hata: " +
+            error.message
+        );
+
+        console.error(error);
+
+    }
+
+}
+
+
+/* ==========================================================
+   YENİ KAYNAK EKLE
+   ========================================================== */
+
+document
+    .getElementById("add-source-form")
+    .addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+
+            const name =
+                document
+                    .getElementById(
+                        "source-name"
+                    )
+                    .value
+                    .trim();
+
+
+            const url =
+                document
+                    .getElementById(
+                        "source-url"
+                    )
+                    .value
+                    .trim();
+
+
+            const enabled =
+                document
+                    .getElementById(
+                        "source-enabled"
+                    )
+                    .value === "true";
+
+
+            if (!name) {
+
+                alert(
+                    "❌ Kaynak adı boş olamaz."
+                );
+
+                return;
+
+            }
+
+
+            if (!url) {
+
+                alert(
+                    "❌ Kaynak URL'si boş olamaz."
+                );
+
+                return;
+
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/api/sources",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                name: name,
+
+                                base_url: url,
+
+                                enabled: enabled,
+
+                                request_delay_seconds: 2
+
+                            })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.detail ||
+                        "Kaynak eklenemedi"
+                    );
+
+                }
+
+
+                alert(
+                    "✅ Kaynak başarıyla eklendi."
+                );
+
+
+                document
+                    .getElementById(
+                        "add-source-form"
+                    )
+                    .reset();
+
+
+                await loadSources();
+
+
+            } catch (error) {
+
+                alert(
+                    "❌ Hata: " +
+                    error.message
+                );
+
+                console.error(error);
+
+            }
+
+        }
+    );
+
+
+/* ==========================================================
+   GÜVENLİK / HTML ESCAPE
+   ========================================================== */
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+function escapeAttribute(value) {
+
+    return escapeHtml(value);
+
+}
+
+
+function escapeJs(value) {
+
+    return String(value)
+        .replaceAll("\\", "\\\\")
+        .replaceAll("'", "\\'")
+        .replaceAll("\n", "\\n")
+        .replaceAll("\r", "\\r");
+
+}
+
+
+/* ==========================================================
+   SAYFA AÇILDIĞINDA
+   ========================================================== */
+
+loadSources();
+
+</script>
+
+</body>
+
+</html>

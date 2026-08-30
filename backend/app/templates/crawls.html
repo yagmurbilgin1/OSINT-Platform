@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Crawl Geçmişi - OSINT Platform</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+    <div class="container">
+
+        <h1>🔎 Crawl Geçmişi</h1>
+
+        <p>
+            OSINT Platform üzerinde gerçekleştirilen veri toplama işlemleri
+        </p>
+
+
+        <!-- ================================================= -->
+        <!-- CRAWL LISTESI -->
+        <!-- ================================================= -->
+
+        <div class="card">
+
+            <h2>📋 Crawl İşlemleri</h2>
+
+            <div id="crawl-list">
+                Yükleniyor...
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- CRAWL DETAYI -->
+        <!-- ================================================= -->
+
+        <div class="card">
+
+            <h2>📊 Crawl Detayı</h2>
+
+            <div id="crawl-detail">
+
+                <p>
+                    Detay görmek için bir crawl seçin.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- CRAWL LOGLARI -->
+        <!-- ================================================= -->
+
+        <div class="card">
+
+            <h2>📝 Crawl Logları</h2>
+
+            <div id="crawl-logs">
+
+                <p>
+                    Detay görmek için bir crawl seçin.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+
+
+        // =====================================================
+        // CRAWL LİSTESİNİ YÜKLE
+        // =====================================================
+
+        async function loadCrawls() {
+
+            const list =
+                document.getElementById("crawl-list");
+
+
+            try {
+
+                const response =
+                    await fetch("/api/crawls");
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Crawl verileri alınamadı."
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                if (
+                    !data.jobs ||
+                    data.jobs.length === 0
+                ) {
+
+                    list.innerHTML = `
+                        <p>
+                            Henüz crawl işlemi bulunmuyor.
+                        </p>
+                    `;
+
+                    return;
+
+                }
+
+
+                let html = `
+
+                    <table
+                        style="
+                            width:100%;
+                            border-collapse:collapse;
+                        "
+                    >
+
+                        <thead>
+
+                            <tr>
+
+                                <th
+                                    style="
+                                        padding:12px;
+                                        text-align:left;
+                                    "
+                                >
+                                    Crawl
+                                </th>
+
+
+                                <th
+                                    style="
+                                        padding:12px;
+                                        text-align:left;
+                                    "
+                                >
+                                    Durum
+                                </th>
+
+
+                                <th
+                                    style="
+                                        padding:12px;
+                                        text-align:left;
+                                    "
+                                >
+                                    İlerleme
+                                </th>
+
+
+                                <th
+                                    style="
+                                        padding:12px;
+                                        text-align:left;
+                                    "
+                                >
+                                    Eklenen
+                                </th>
+
+
+                                <th
+                                    style="
+                                        padding:12px;
+                                        text-align:left;
+                                    "
+                                >
+                                    Hata
+                                </th>
+
+
+                                <th
+                                    style="
+                                        padding:12px;
+                                        text-align:left;
+                                    "
+                                >
+                                    Detay
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+                `;
+
+
+                data.jobs.forEach(job => {
+
+                    html += `
+
+                        <tr>
+
+                            <td
+                                style="
+                                    padding:12px;
+                                    border-top:1px solid #ddd;
+                                "
+                            >
+                                #${job.id}
+                            </td>
+
+
+                            <td
+                                style="
+                                    padding:12px;
+                                    border-top:1px solid #ddd;
+                                "
+                            >
+                                ${job.status}
+                            </td>
+
+
+                            <td
+                                style="
+                                    padding:12px;
+                                    border-top:1px solid #ddd;
+                                "
+                            >
+                                ${job.progress}%
+                            </td>
+
+
+                            <td
+                                style="
+                                    padding:12px;
+                                    border-top:1px solid #ddd;
+                                "
+                            >
+                                ${job.records_extracted}
+                            </td>
+
+
+                            <td
+                                style="
+                                    padding:12px;
+                                    border-top:1px solid #ddd;
+                                "
+                            >
+                                ${job.error_count}
+                            </td>
+
+
+                            <td
+                                style="
+                                    padding:12px;
+                                    border-top:1px solid #ddd;
+                                "
+                            >
+
+                                <button
+                                    onclick="
+                                        showCrawl(${job.id})
+                                    "
+                                >
+                                    Görüntüle
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                });
+
+
+                html += `
+
+                        </tbody>
+
+                    </table>
+
+                `;
+
+
+                list.innerHTML = html;
+
+
+            } catch (error) {
+
+                list.innerHTML = `
+
+                    <p>
+                        ❌ Crawl verileri yüklenirken hata oluştu:
+                        ${error.message}
+                    </p>
+
+                `;
+
+            }
+
+        }
+
+
+
+        // =====================================================
+        // CRAWL DETAYINI GÖSTER
+        // =====================================================
+
+        async function showCrawl(jobId) {
+
+            const detail =
+                document.getElementById("crawl-detail");
+
+
+            const logs =
+                document.getElementById("crawl-logs");
+
+
+            detail.innerHTML =
+                "Yükleniyor...";
+
+
+            logs.innerHTML =
+                "Loglar yükleniyor...";
+
+
+            try {
+
+                // ------------------------------------------------
+                // CRAWL DETAYI
+                // ------------------------------------------------
+
+                const response =
+                    await fetch(
+                        `/api/crawls/${jobId}`
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Crawl detayı alınamadı."
+                    );
+
+                }
+
+
+                const job =
+                    await response.json();
+
+
+                detail.innerHTML = `
+
+                    <p>
+                        <strong>Crawl ID:</strong>
+                        #${job.id}
+                    </p>
+
+
+                    <p>
+                        <strong>Durum:</strong>
+                        ${job.status}
+                    </p>
+
+
+                    <p>
+                        <strong>İlerleme:</strong>
+                        ${job.progress}%
+                    </p>
+
+
+                    <p>
+                        <strong>Başlangıç:</strong>
+                        ${job.started_at || "-"}
+                    </p>
+
+
+                    <p>
+                        <strong>Tamamlanma:</strong>
+                        ${job.completed_at || "-"}
+                    </p>
+
+
+                    <p>
+                        <strong>Ziyaret edilen sayfa:</strong>
+                        ${job.pages_visited}
+                    </p>
+
+
+                    <p>
+                        <strong>Eklenen kayıt:</strong>
+                        ${job.records_extracted}
+                    </p>
+
+
+                    <p>
+                        <strong>Hata sayısı:</strong>
+                        ${job.error_count}
+                    </p>
+
+                `;
+
+
+                // ------------------------------------------------
+                // CRAWL LOGLARI
+                // ------------------------------------------------
+
+                const logResponse =
+                    await fetch(
+                        `/api/crawls/${jobId}/logs`
+                    );
+
+
+                if (!logResponse.ok) {
+
+                    throw new Error(
+                        "Crawl logları alınamadı."
+                    );
+
+                }
+
+
+                const logData =
+                    await logResponse.json();
+
+
+                if (
+                    !logData.logs ||
+                    logData.logs.length === 0
+                ) {
+
+                    logs.innerHTML = `
+
+                        <p>
+                            Bu crawl için log kaydı bulunmuyor.
+                        </p>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                let logHtml = `
+
+                    <div>
+
+                `;
+
+
+                logData.logs.forEach(log => {
+
+                    logHtml += `
+
+                        <div
+                            style="
+                                padding:12px;
+                                margin-bottom:10px;
+                                border:1px solid #ddd;
+                                border-radius:8px;
+                            "
+                        >
+
+                            <strong>
+                                ${log.log_level}
+                            </strong>
+
+                            <span>
+                                —
+                            </span>
+
+                            ${log.message}
+
+                            <br>
+
+                            <small>
+
+                                Kaynak:
+                                ${log.source}
+
+                                |
+
+                                ${log.created_at}
+
+                            </small>
+
+                        </div>
+
+                    `;
+
+                });
+
+
+                logHtml += `
+
+                    </div>
+
+                `;
+
+
+                logs.innerHTML =
+                    logHtml;
+
+
+            } catch (error) {
+
+                detail.innerHTML = `
+
+                    ❌ ${error.message}
+
+                `;
+
+
+                logs.innerHTML = `
+
+                    ❌ ${error.message}
+
+                `;
+
+            }
+
+        }
+
+
+
+        // =====================================================
+        // SAYFA AÇILINCA CRAWL'LARI GETİR
+        // =====================================================
+
+        loadCrawls();
+
+
+    </script>
+
+</body>
+
+</html>

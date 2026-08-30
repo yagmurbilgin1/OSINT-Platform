@@ -2,55 +2,90 @@
 <html lang="tr">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Arama Geçmişi</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Arama Geçmişi - OSINT Platform</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+
 </head>
 
 <body>
 
 <div class="container">
 
-<h1>🕘 Arama Geçmişi</h1>
+    <h1>🕘 Arama Geçmişi</h1>
 
-<table>
+    <p>OSINT Platform üzerinde yaptığınız aramalar aşağıda listelenmektedir.</p>
 
-<tr>
-<th>Kelime</th>
-<th>Tarih</th>
-</tr>
+    {% if searches %}
 
-{% for row in searches %}
+    <table>
 
-<tr>
+        <thead>
 
-<td>{{ row[0] }}</td>
+            <tr>
 
-<td>{{ row[1] }}</td>
+                <th>Kelime</th>
 
-</tr>
+                <th>Tarih</th>
 
-{% endfor %}
+            </tr>
 
-</table>
+        </thead>
 
-<br>
+        <tbody>
 
-<a href="/">← Ana Sayfa</a>
+            {% for row in searches %}
 
-<br><br>
+            <tr>
 
-<a class="history-button" href="/download-csv">
-    📥 CSV İndir
-</a>
+                <td>{{ row[0] }}</td>
 
-&nbsp;&nbsp;
+                <td>{{ row[1] }}</td>
 
-<a class="history-button" href="/download-pdf">
-    📄 PDF İndir
-</a>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    {% else %}
+
+    <p>
+        Henüz herhangi bir arama yapılmamış.
+    </p>
+
+    {% endif %}
+
+    <br>
+
+    <a class="history-button" href="/">
+        ← Yeni Arama
+    </a>
+
+    <br><br>
+
+    <a class="history-button" href="/dashboard">
+        📊 Dashboard
+    </a>
+
+    <br><br>
+
+    <a class="history-button" href="/download-csv">
+        📥 CSV İndir
+    </a>
+
+    &nbsp;&nbsp;
+
+    <a class="history-button" href="/download-pdf">
+        📄 PDF İndir
+    </a>
 
 </div>
 

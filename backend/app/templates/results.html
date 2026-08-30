@@ -3,10 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>OSINT Sonuçları</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 
 <body>
@@ -15,79 +16,131 @@
 
     <h1>🛡️ OSINT Sonuçları</h1>
 
-    {% for item in results %}
-
-    <div class="card">
-
-        <h2>{{ item.title }}</h2>
-
-        <p>{{ item.description }}</p>
-
-        <p>📌 <strong>Kaynak:</strong> {{ item.source }}</p>
+    {% if results %}
 
         <p>
-            ⚠️ <strong>Risk:</strong>
-
-            {% if item.severity == "CRITICAL" %}
-                <span class="critical">{{ item.severity }}</span>
-
-            {% elif item.severity == "HIGH" %}
-                <span class="high">{{ item.severity }}</span>
-
-            {% elif item.severity == "MEDIUM" %}
-                <span class="medium">{{ item.severity }}</span>
-
-            {% elif item.severity == "LOW" %}
-                <span class="low">{{ item.severity }}</span>
-
-            {% else %}
-                <span>{{ item.severity }}</span>
-
-            {% endif %}
+            <strong>{{ results|length }}</strong> güvenlik duyurusu bulundu.
         </p>
 
-        <p>📊 <strong>CVSS Skoru:</strong> {{ item.score }}</p>
-        
-        <p>📅 <strong>Yayın Tarihi:</strong> {{ item.published }}</p>
+        {% for item in results %}
 
-        <p>🔄 <strong>Son Güncelleme:</strong> {{ item.modified }}</p>
-        
-        <br>
+        <div class="card">
 
-        <a class="detail-button"
-   href="{{ item.link }}"
-   target="_blank">
-    🔗 NVD'de Aç
-</a>
+            <h2>{{ item.title }}</h2>
 
-    </div>
+            <p>{{ item.description }}</p>
 
-    {% endfor %}
+            <p>
+                📌 <strong>Kaynak:</strong>
+                {{ item.source }}
+            </p>
+
+            <p>
+                ⚠️ <strong>Risk:</strong>
+
+                {% if item.severity == "CRITICAL" %}
+
+                    <span class="critical">
+                        {{ item.severity }}
+                    </span>
+
+                {% elif item.severity == "HIGH" %}
+
+                    <span class="high">
+                        {{ item.severity }}
+                    </span>
+
+                {% elif item.severity == "MEDIUM" %}
+
+                    <span class="medium">
+                        {{ item.severity }}
+                    </span>
+
+                {% elif item.severity == "LOW" %}
+
+                    <span class="low">
+                        {{ item.severity }}
+                    </span>
+
+                {% else %}
+
+                    <span>
+                        {{ item.severity }}
+                    </span>
+
+                {% endif %}
+
+            </p>
+
+            <p>
+                📊 <strong>CVSS Skoru:</strong>
+                {{ item.score }}
+            </p>
+
+            <p>
+                📅 <strong>Yayın Tarihi:</strong>
+                {{ item.published }}
+            </p>
+
+            <p>
+                🔄 <strong>Son Güncelleme:</strong>
+                {{ item.modified }}
+            </p>
+
+            <br>
+
+            <a
+                class="detail-button"
+                href="{{ item.link }}"
+                target="_blank"
+                rel="noopener noreferrer">
+                🔗 NVD'de Aç
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="card">
+
+            <h2>Sonuç bulunamadı</h2>
+
+            <p>
+                Aradığınız kriterlere uygun bir güvenlik duyurusu bulunamadı.
+            </p>
+
+        </div>
+
+    {% endif %}
 
     <br>
 
-    <a href="/">← Yeni Arama</a>
+    <a class="history-button" href="/">
+        ← Yeni Arama
+    </a>
 
-    <br>
+    <br><br>
 
+    <a class="history-button" href="/history">
+        🕘 Arama Geçmişi
+    </a>
 
-&nbsp;&nbsp;&nbsp;
+    <br><br>
 
-<a class="history-button" href="/history">
-    🕘 Arama Geçmişi
-</a>
+    <a class="history-button" href="/download-csv">
+        📥 CSV İndir
+    </a>
 
-&nbsp;&nbsp;&nbsp;
+    <br><br>
 
-<a class="history-button" href="/download-csv">
-    📥 CSV İndir
-</a>
-
-<a class="history-button" href="/download-pdf">
-    📄 PDF İndir
-</a>
+    <a class="history-button" href="/download-pdf">
+        📄 PDF İndir
+    </a>
 
 </div>
 
 </body>
+
 </html>
